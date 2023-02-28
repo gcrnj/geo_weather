@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.utils.widget.ImageFilterView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/btnBack"
+    style="?attr/selectableItemBackground"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:padding="@dimen/_3sdp"
+    android:src="@drawable/ic_back"
+    app:roundPercent="0.5"
+    app:tint="@color/black_charcoal" />
