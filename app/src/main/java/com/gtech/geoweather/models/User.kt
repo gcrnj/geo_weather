@@ -22,8 +22,7 @@ data class User(
     @ColumnInfo(name = "middle_name") val middleName: String,
     @ColumnInfo(name = "last_name") val lastName: String,
     @ColumnInfo(name = "email") val email: String,
-    @ColumnInfo(name = "mobile_number") val mobileNumber: String,
-    @ColumnInfo(name = "hashed_password") val hashedPassword: String
+    @ColumnInfo(name = "mobile_number") val mobileNumber: String
 ) {
 
     // Will return null if the user is validated
@@ -68,7 +67,7 @@ data class User(
 
         // Return null if not validated, otherwise return user with errors
         return if (validated) null
-        else User(0, eFirstName, eMiddleName, eLastName, eEmail, eMobileNumber, "null")
+        else User(0, eFirstName, eMiddleName, eLastName, eEmail, eMobileNumber)
     }
 
     private fun isValidEmail(): Boolean {

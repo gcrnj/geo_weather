@@ -1,16 +1,20 @@
 package com.gtech.geoweather.sections.activity_register
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log.d
 import android.view.View
-import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.textfield.TextInputLayout
-import com.gtech.geoweather.common.AppBarCustom
-import com.gtech.geoweather.common.PasswordUtils
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.gtech.geoweather.common.setupAppBar
 import com.gtech.geoweather.databinding.ActivityRegisterBinding
 import com.gtech.geoweather.local_database.AppDatabase
 import com.gtech.geoweather.models.User
@@ -21,15 +25,23 @@ import kotlinx.coroutines.*
 class RegisterActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityRegisterBinding.inflate(layoutInflater) }
-    private val viewModel: RegisterViewModel by viewModels()
     private val userDao by lazy { AppDatabase.getDatabase(this).userDao() }
-
+    private val firebaseAuth: FirebaseAuth by lazy { Firebase.auth }
+    private val firestoreDb by lazy { Firebase.firestore }
+    private val simpleAlertDialog by lazy {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setCancelable(false)
+        dialog.setPositiveButton("Ok") { mDialog, _ ->
+            mDialog.dismiss()
+        }
+        dialog
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        setupAppBar()
+        setupAppBar("Register", true)
 
         binding.btnSignUp.setOnClickListener {
             validateRegister()
@@ -37,11 +49,6 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
-
-    private fun setupAppBar() {
-        val appBarCustom = AppBarCustom(this, true)
-        appBarCustom.title = "Sign In"
-    }
 
     private fun validateRegister() {
         resetErrors()
@@ -58,7 +65,6 @@ class RegisterActivity : AppCompatActivity() {
             lastName = lastName,
             email = email,
             mobileNumber = mobileNumber,
-            hashedPassword = ""
         )
 
         //Validate errors first
@@ -83,9 +89,48 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
 
-        // Validated - register the user
-        val newUser = user.copy(hashedPassword = PasswordUtils.hash(password))
-        register(newUser)
+        // Validated - check email if already registered
+        createUserInAuth(user, password)
+//        registerToLocalDB(user)
+    }
+
+    private fun createUserInAuth(newUser: User, password: String) {
+        firebaseAuth.createUserWithEmailAndPassword(newUser.email, password)
+            .addOnCompleteListener(this,
+                OnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        //User registered successfully
+                        registerInDb(newUser)
+                    } else {
+                        // User not registered
+                        task.exception?.printStackTrace()
+                        val errorMessage = task.exception?.message ?: "Message not found"
+                        if (errorMessage.contains("email"))
+                            binding.tILayoutEmail.error = errorMessage
+                        else
+                            showAlertDialog(
+                                "Failed to create user",
+                                errorMessage
+                            )
+                    }
+                })
+    }
+
+    private fun registerInDb(newUser: User) {
+        firestoreDb.collection("users").add(newUser)
+            .addOnSuccessListener {
+                //authenticate in firebase firestore
+                registerToLocalDB(newUser)
+            }
+            .addOnFailureListener { exception ->
+                //failed to create the user
+                showAlertDialog(
+                    "Failed to create user",
+                    exception.message ?: "Message not found"
+                )
+                //since it is already a logged in account, then I need to logout that account
+                firebaseAuth.signOut()
+            }
     }
 
     private fun resetErrors() {
@@ -96,7 +141,7 @@ class RegisterActivity : AppCompatActivity() {
         }
     }
 
-    private fun register(user: User) {
+    private fun registerToLocalDB(user: User) {
         lifecycleScope.launch {
             val foundByMobile = userDao.findByMobile(user.mobileNumber)
             if (foundByMobile != null) {
@@ -126,5 +171,11 @@ class RegisterActivity : AppCompatActivity() {
 
         }
         CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {}
+    }
+
+    fun showAlertDialog(title: String, message: String) {
+        simpleAlertDialog.setTitle(title)
+        simpleAlertDialog.setMessage(message)
+        simpleAlertDialog.show()
     }
 }

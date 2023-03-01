@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "478706499080",
+    "project_id": "geo-weather-603ea",
+    "storage_bucket": "geo-weather-603ea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:478706499080:android:9090900bc078ef6142dbbd",
+        "android_client_info": {
+          "package_name": "com.gtech.geoweather"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "478706499080-jb2jdqltv9j8brejt1qo321tmbqaaaq8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gtech.geoweather",
+            "certificate_hash": "18827a8504249b7611008314ee138435602e1aee"
+          }
+        },
+        {
+          "client_id": "478706499080-jtp6mt8ccla3qnscg2mrtpip0farjmiu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDwyehL5ig4I_mlv1apRwm2b9jUlNfISoo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "478706499080-jtp6mt8ccla3qnscg2mrtpip0farjmiu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
