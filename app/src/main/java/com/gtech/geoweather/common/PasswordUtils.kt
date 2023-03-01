@@ -1,4 +1,5 @@
 package com.gtech.geoweather.common
+
 import org.mindrot.jbcrypt.BCrypt
 
 object PasswordUtils {

@@ -16,6 +16,13 @@
         android:theme="@style/Theme.GeoWeather"
         tools:targetApi="31">
         <activity
+            android:name=".sections.activity_landing_page.LandingPageActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".sections.activity_register.RegisterActivity"
             android:exported="false"
             android:launchMode="singleTask">

@@ -1,4 +1,5 @@
 package com.gtech.geoweather.api
+
 import com.gtech.geoweather.models.WeatherResponse
 import retrofit2.Call
 import retrofit2.http.GET

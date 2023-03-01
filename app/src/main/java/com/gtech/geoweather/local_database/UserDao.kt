@@ -8,9 +8,12 @@ import com.gtech.geoweather.models.User
 
 @Dao
 interface UserDao {
-    @Query("SELECT * FROM users WHERE (email = :mobileOrEmail OR mobileNumber = :mobileOrEmail) LIMIT 1")
-    fun findByMobileOrEmailNumber(mobileOrEmail: String): User?
+    @Query("SELECT * FROM users WHERE (mobile_number = :mobile) LIMIT 1")
+    suspend fun findByMobile(mobile: String): User?
+
+    @Query("SELECT * FROM users WHERE (email = :email) LIMIT 1")
+    suspend fun findByEmail(email: String): User?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(user: User)
+    suspend fun insert(user: User)
 }
