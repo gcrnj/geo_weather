@@ -13,4 +13,6 @@
     <string name="middle_name">Middle Name</string>
     <string name="last_name">Last Name</string>
     <string name="mobile_number_email_address">Mobile Number / Email Address</string>
+    <string name="today">Today</string>
+    <string name="history">History</string>
 </resources>
