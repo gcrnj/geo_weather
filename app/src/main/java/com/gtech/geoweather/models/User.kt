@@ -3,19 +3,23 @@ package com.gtech.geoweather.models
 import android.text.TextUtils
 import android.util.Log
 import android.util.Patterns
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 
+@Entity(tableName = "users")
 data class User(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val firstName: String,
-    val middleName: String?,
+    val middleName: String,
     val lastName: String,
     val email: String,
     val mobileNumber: String,
+    val hashedPassword: String
 ) {
 
     // Will return null if the user is validated
-    var errors: User? = null
-        get() {
+    fun errors(): User? {
             //Error Messages
             var eFirstName = ""
             var eMiddleName = ""
@@ -56,9 +60,8 @@ data class User(
 
             // Return null if not validated, otherwise return user with errors
             return if (validated) null
-            else User(eFirstName, eMiddleName, eLastName, eEmail, eMobileNumber)
+            else User(0, eFirstName, eMiddleName, eLastName, eEmail, eMobileNumber, "null")
         }
-        private set // Remove setter
 
     private fun isValidEmail(): Boolean {
         return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
