@@ -11,7 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class OpenWeatherMapService(private val context: Context) {
 
-    companion object{
+    companion object {
         private const val BASE_URL = "https://api.openweathermap.org"
         private const val CACHE_SIZE = (10 * 1024 * 1024).toLong() // 10 MB
     }
@@ -47,10 +47,12 @@ class OpenWeatherMapService(private val context: Context) {
     val api: OpenWeatherMapApi = retrofit.create(OpenWeatherMapApi::class.java)
 
     private fun hasNetworkAvailable(): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val networkCapabilities = connectivityManager.activeNetwork ?: return false
-            val activeNetwork = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+            val activeNetwork =
+                connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
             val hasTransport = activeNetwork::hasTransport
             return when {
                 hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true

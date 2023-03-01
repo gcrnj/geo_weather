@@ -46,7 +46,6 @@ dependencies {
     implementation 'androidx.test:core-ktx:1.5.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
     // Retrofit, Gson and okhttp
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
@@ -64,6 +63,7 @@ dependencies {
     // Room
     def roomVersion = "2.5.0"
     implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
     annotationProcessor "androidx.room:room-compiler:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
 
@@ -80,8 +80,13 @@ dependencies {
     //BCrypt
     implementation 'org.mindrot:jbcrypt:0.4'
 
-    //Espresso
-    androidTestImplementation('androidx.test:runner:1.5.2')
-    androidTestImplementation('androidx.test.espresso:espresso-core:3.5.1')
+    // Espresso / For Unit Testing
+    def espressoVersion = "3.5.1"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
+//    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-web:$espressoVersion"
+    implementation 'androidx.test.ext:junit-ktx:1.1.5'
+    testImplementation 'org.hamcrest:hamcrest:1.3'
 
 }

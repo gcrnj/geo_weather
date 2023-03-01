@@ -1,17 +1,27 @@
 package com.gtech.geoweather.sections.activity_register
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log.d
+import android.view.View
+import androidx.activity.viewModels
+import androidx.core.view.children
+import androidx.lifecycle.lifecycleScope
+import com.google.android.material.textfield.TextInputLayout
 import com.gtech.geoweather.common.AppBarCustom
 import com.gtech.geoweather.common.PasswordUtils
 import com.gtech.geoweather.databinding.ActivityRegisterBinding
 import com.gtech.geoweather.local_database.AppDatabase
 import com.gtech.geoweather.models.User
+import com.gtech.geoweather.sections.activity_landing_page.LandingPageActivity
+import kotlinx.coroutines.*
+
 
 class RegisterActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityRegisterBinding.inflate(layoutInflater) }
+    private val viewModel: RegisterViewModel by viewModels()
     private val userDao by lazy { AppDatabase.getDatabase(this).userDao() }
 
 
@@ -34,6 +44,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun validateRegister() {
+        resetErrors()
         val firstName = binding.tILayoutFirstName.editText?.text.toString()
         val middleName = binding.tILayoutMiddleName.editText?.text.toString()
         val lastName = binding.tILayoutLastName.editText?.text.toString()
@@ -51,30 +62,69 @@ class RegisterActivity : AppCompatActivity() {
         )
 
         //Validate errors first
-        user.errors()?.let {
-            d("Regiter", it.toString())
+        val errors = user.errors()
+        if (errors != null) {
+            d("Register", errors.toString())
             // Not Validated - display errors
-            binding.tILayoutFirstName.error = it.firstName
-            binding.tILayoutMiddleName.error = it.middleName
-            binding.tILayoutLastName.error = it.lastName
-            binding.tILayoutEmail.error = it.email
-            binding.tILayoutMobileNumber.error = it.mobileNumber
-        }?.run {
+            binding.tILayoutFirstName.error = errors.firstName
+            binding.tILayoutMiddleName.error = errors.middleName
+            binding.tILayoutLastName.error = errors.lastName
+            binding.tILayoutEmail.error = errors.email
+            binding.tILayoutMobileNumber.error = errors.mobileNumber
+            return
+        }
 
-            //Validated - check password
-            val passwordValidator = User.isValidPasswords(password, confirmPassword)
-            passwordValidator?.let {
-                binding.tILayoutPassword.error = it[User.PASSWORD]
-                binding.tILayoutConfirmPassword.error = it[User.CONFIRM_PASSWORD]
-            }?.run {
-                // Validated - register the user
-                val newUser = user.copy(hashedPassword = PasswordUtils.hash(password))
+        //Validated - check password
+        val passwordValidator = User.isValidPasswords(password, confirmPassword)
+        if (passwordValidator != null) {
+            d("Register", "1")
+            binding.tILayoutPassword.error = passwordValidator[User.PASSWORD]
+            binding.tILayoutConfirmPassword.error = passwordValidator[User.CONFIRM_PASSWORD]
+            return
+        }
 
+        // Validated - register the user
+        val newUser = user.copy(hashedPassword = PasswordUtils.hash(password))
+        register(newUser)
+    }
+
+    private fun resetErrors() {
+        for (view: View in binding.linearForm.children) {
+            if (view is TextInputLayout) {
+                view.error = null
             }
         }
     }
 
-    fun register(user: User) {
-        userDao.insert(user)
+    private fun register(user: User) {
+        lifecycleScope.launch {
+            val foundByMobile = userDao.findByMobile(user.mobileNumber)
+            if (foundByMobile != null) {
+                withContext(Dispatchers.Main) {
+                    binding.tILayoutMobileNumber.error = "This Mobile Number is already registered"
+                }
+            }
+            val foundByEmail = userDao.findByEmail(user.email)
+            if (foundByEmail != null) {
+                withContext(Dispatchers.Main) {
+                    binding.tILayoutEmail.error = "This Email is already registered"
+                }
+            }
+
+            if (foundByMobile != null || foundByEmail != null) {
+                // there are error/s
+                return@launch
+            }
+            //register
+            userDao.insert(user)
+            //go to landing page
+            val landingPageIntent = Intent(this@RegisterActivity, LandingPageActivity::class.java)
+            landingPageIntent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(landingPageIntent)
+            finish()
+
+        }
+        CoroutineScope(Dispatchers.Main).launch(Dispatchers.IO) {}
     }
 }
