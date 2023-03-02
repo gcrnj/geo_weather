@@ -6,6 +6,7 @@ import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.gtech.geoweather.common.hideSoftKeyboard
 import com.gtech.geoweather.common.setupAppBar
 import com.gtech.geoweather.databinding.ActivitySignInBinding
 import com.gtech.geoweather.local_database.AppDatabase
@@ -26,6 +27,7 @@ class SignInActivity : AppCompatActivity() {
         setupAppBar("Sign In", true)
 
         binding.btnSignIn.setOnClickListener {
+            hideSoftKeyboard()
             validateLogin()
         }
 

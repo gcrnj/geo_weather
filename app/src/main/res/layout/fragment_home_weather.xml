@@ -1,14 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/pale_blue"
     android:layout_height="match_parent"
+    android:background="@drawable/night"
     tools:context=".sections.fragment_weather_home.HomeWeatherFragment">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello" />
+        android:layout_height="match_parent">
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtDegreeCelsius"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_100sdp"
+                android:layout_margin="@dimen/_5sdp"
+                android:gravity="bottom"
+                android:textColor="@color/white"
+                app:autoSizeTextType="uniform"
+                app:layout_constraintEnd_toStartOf="@id/txtWeatherDesc"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="255°C" />
+
+
+            <ImageView
+                android:id="@+id/imgWeather"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/txtDegreeCelsius"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:id="@+id/txtWeatherDesc"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_30sdp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/txtDegreeCelsius"
+                app:layout_constraintTop_toBottomOf="@id/imgWeather"
+                tools:text="@string/degree_celsius" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </FrameLayout>
