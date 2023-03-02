@@ -4,54 +4,158 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/night"
+    android:background="@color/black_charcoal2"
     tools:context=".sections.fragment_weather_home.HomeWeatherFragment">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/txtLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_15sdp"
+                tools:text="Pasig, Philippines" />
+
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/txtDegreeCelsius"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_100sdp"
-                android:layout_margin="@dimen/_5sdp"
-                android:gravity="bottom"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_80sdp"
+                android:layout_marginHorizontal="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:gravity="center"
                 android:textColor="@color/white"
+                android:textStyle="bold"
+                app:autoSizeMaxTextSize="@dimen/_55sdp"
                 app:autoSizeTextType="uniform"
-                app:layout_constraintEnd_toStartOf="@id/txtWeatherDesc"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="255°C" />
+                tools:text="20°C" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardWeatherDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    app:cardBackgroundColor="@color/black_charcoal1"
+                    app:cardCornerRadius="@dimen/_10sdp"
+                    app:cardElevation="5dp"
+                    app:cardPreventCornerOverlap="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
 
-            <ImageView
-                android:id="@+id/imgWeather"
-                android:layout_width="0dp"
+                        <androidx.appcompat.widget.AppCompatTextView
+                            android:id="@+id/txtWeatherDesc"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="start"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:layout_marginEnd="@dimen/_80sdp"
+                            android:gravity="fill_vertical"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_18sdp"
+                            android:textStyle="bold"
+                            tools:text="Broken Clouds" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:layout_marginTop="@dimen/_15sdp"
+                            android:layout_marginBottom="@dimen/_10sdp"
+                            android:textColor="@color/white_text_color"
+                            tools:text="Some text" />
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.constraintlayout.utils.widget.ImageFilterView
+                    android:id="@+id/imgWeather"
+                    android:layout_width="@dimen/_60sdp"
+                    android:layout_height="@dimen/_60sdp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="@dimen/_30sdp"
+                    android:elevation="7dp"
+                    app:layout_constraintBottom_toTopOf="@id/cardWeatherDetails"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/cardWeatherDetails"
+                    tools:src="@drawable/loading" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_5sdp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/txtDegreeCelsius"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:src="@mipmap/ic_launcher" />
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/txtWeatherDesc"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_5sdp"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:textColor="@color/white"
-                android:textSize="@dimen/_30sdp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/txtDegreeCelsius"
-                app:layout_constraintTop_toBottomOf="@id/imgWeather"
-                tools:text="@string/degree_celsius" />
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageView
+                        android:layout_width="@dimen/_50sdp"
+                        android:layout_height="@dimen/_50sdp"
+                        android:src="@drawable/sunset" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/txtSunrise"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_20sdp"
+                        tools:text="5:40pm" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="@dimen/_50sdp"
+                        android:layout_height="@dimen/_50sdp"
+                        android:src="@drawable/sunrise" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/txtSunset"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_20sdp"
+                        tools:text="5:40am" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
     </ScrollView>
 </FrameLayout>

@@ -11,6 +11,7 @@ interface OpenWeatherMapApi {
     fun getCurrentWeather(
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
+        @Query("units") units: String,
         @Query("appid") apiKey: String
     ): Call<WeatherResponse>
 }

@@ -12,6 +12,8 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <!--FULL SCREEN-->
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="Theme.GeoWeather.MaterialButton.ZeroInset" parent="Widget.MaterialComponents.Button">
