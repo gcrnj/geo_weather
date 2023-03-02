@@ -9,7 +9,8 @@ interface OpenWeatherMapApi {
 
     @GET("weather")
     fun getCurrentWeather(
-        @Query("q") location: String,
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
         @Query("appid") apiKey: String
     ): Call<WeatherResponse>
 }

@@ -3,9 +3,7 @@ package com.gtech.geoweather.sections.activity_landing_page
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.gtech.geoweather.R
 import com.gtech.geoweather.databinding.ActivityLandingPageBinding
 import com.gtech.geoweather.sections.fragment_wather_history.WeatherHistoryFragment
 import com.gtech.geoweather.sections.fragment_weather_home.HomeWeatherFragment
@@ -61,5 +59,4 @@ class LandingPageActivity : AppCompatActivity() {
             commit()
         }
     }
-
 }
