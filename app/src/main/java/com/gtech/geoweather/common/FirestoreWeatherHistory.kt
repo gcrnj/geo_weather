@@ -11,7 +11,7 @@ class FirestoreWeatherHistory(
 ) :
     FirestoreHelper<List<WeatherDatabaseData?>, Task<DocumentReference>?, WeatherDatabaseData> {
 
-    private val firebaseCollection: CollectionReference =
+    val firebaseCollection: CollectionReference =
         firestoreDb.collection("users").document(userDocumentId.toString()).collection("history")
 
     override suspend fun get(): List<WeatherDatabaseData?>? {

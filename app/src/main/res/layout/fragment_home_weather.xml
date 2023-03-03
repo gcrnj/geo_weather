@@ -4,12 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black_charcoal2"
+    tools:background="@color/afternoon"
     tools:context=".sections.fragment_weather_home.HomeWeatherFragment">
 
     <ScrollView
+        android:id="@+id/scrollContent"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -24,7 +27,7 @@
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_marginTop="@dimen/_15sdp"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="@dimen/_15sdp"
                 tools:text="Pasig, Philippines" />
 
@@ -36,7 +39,7 @@
                 android:layout_marginHorizontal="@dimen/_5sdp"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:gravity="center"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textStyle="bold"
                 app:autoSizeMaxTextSize="@dimen/_55sdp"
                 app:autoSizeTextType="uniform"
@@ -52,7 +55,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/_15sdp"
                     android:layout_marginTop="@dimen/_20sdp"
-                    app:cardBackgroundColor="@color/black_charcoal1"
+                    app:cardBackgroundColor="@color/afternoon_card"
                     app:cardCornerRadius="@dimen/_10sdp"
                     app:cardElevation="5dp"
                     app:cardPreventCornerOverlap="true"
@@ -75,18 +78,19 @@
                             android:layout_marginTop="@dimen/_5sdp"
                             android:layout_marginEnd="@dimen/_80sdp"
                             android:gravity="fill_vertical"
-                            android:textColor="@color/white"
+                            android:textColor="@color/black"
                             android:textSize="@dimen/_18sdp"
                             android:textStyle="bold"
                             tools:text="Broken Clouds" />
 
                         <TextView
+                            android:id="@+id/txtWeatherDescAdditional"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/_10sdp"
                             android:layout_marginTop="@dimen/_15sdp"
                             android:layout_marginBottom="@dimen/_10sdp"
-                            android:textColor="@color/white_text_color"
+                            android:textColor="@color/black_charcoal2"
                             tools:text="Some text" />
                     </LinearLayout>
 
@@ -129,7 +133,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textColor="@color/white"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/_20sdp"
                         tools:text="5:40pm" />
                 </LinearLayout>
@@ -152,7 +156,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:textColor="@color/white"
+                        android:textColor="@color/black"
                         android:textSize="@dimen/_20sdp"
                         tools:text="5:40am" />
                 </LinearLayout>
@@ -160,4 +164,30 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/relativeAcceptPermission"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp"
+        android:visibility="gone"
+        tools:background="@color/white"
+        tools:visibility="visible">
+
+        <TextView
+            style="@style/TextAppearance.GeoWeather.TitleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
+            android:text="@string/we_need_your_location_to_provide_you_with_relevant_information" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAcceptPermission"
+            style="@style/Theme.GeoWeather.MaterialButton.ZeroInset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/accept_location_permission" />
+    </LinearLayout>
 </FrameLayout>

@@ -22,5 +22,7 @@
     <string name="time_at_city_country">%1$s\nat %2$s, %3$s</string>
     <string name="sign_out">Sign Out</string>
     <string name="edit_profile">Edit Profile</string>
+    <string name="we_need_your_location_to_provide_you_with_relevant_information">We need your location to provide you with relevant information.</string>
+    <string name="accept_location_permission">Accept Location Permission</string>
 
 </resources>

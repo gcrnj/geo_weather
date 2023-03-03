@@ -69,13 +69,6 @@ dependencies {
     // LiveData
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
 
-    // Room
-    def roomVersion = "2.5.0"
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-ktx:$roomVersion"
-    annotationProcessor "androidx.room:room-compiler:$roomVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
-
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
 
@@ -92,7 +85,6 @@ dependencies {
     // Espresso / For Unit Testing
     def espressoVersion = "3.5.1"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
-//    androidTestImplementation "androidx.test.espresso:espresso-contrib:$espressoVersion"
     androidTestImplementation "androidx.test.espresso:espresso-intents:$espressoVersion"
     androidTestImplementation "androidx.test.espresso:espresso-web:$espressoVersion"
     implementation 'androidx.test.ext:junit-ktx:1.1.5'

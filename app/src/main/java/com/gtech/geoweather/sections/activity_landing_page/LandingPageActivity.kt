@@ -30,6 +30,8 @@ class LandingPageActivity : AppCompatActivity() {
 
         })
 
+        binding.bottomBar.selectTabAt(0)
+
     }
 
     private fun replaceFragments(selected: Fragment) {
