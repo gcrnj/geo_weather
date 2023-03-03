@@ -15,5 +15,7 @@
     <string name="mobile_number_email_address">Mobile Number / Email Address</string>
     <string name="today">Today</string>
     <string name="history">History</string>
-    <string name="degree_celsius">%1$d°C</string>
+    <string name="degree_celsius">%1$s°C</string>
+    <string name="location_city_country">%1$s, %2$s</string>
+
 </resources>

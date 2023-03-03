@@ -1,5 +1,6 @@
 package com.gtech.geoweather
 
+import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.launchActivity
@@ -9,6 +10,8 @@ import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.runner.RunWith
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -21,7 +24,12 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
-
+    fun convertTimeMillisToTime(timeInMillis: Int): String {
+        val dateFormat = SimpleDateFormat("mm dd, yy hh:mm a", Locale.ENGLISH)
+        Log.d("HomeWeather", dateFormat.format(Date(timeInMillis.toLong())))
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
+        return timeFormat.format(Date(timeInMillis.toLong()))
+    }
 
     private lateinit var scene : ActivityScenario<WelcomeActivity>
 

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.IntentSender
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -16,19 +17,24 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.type.LatLng
 import com.gtech.geoweather.BuildConfig
 import com.gtech.geoweather.api.OpenWeatherMapService
+import com.gtech.geoweather.common.Countries
 import com.gtech.geoweather.common.LocationPermissionHandler
 import com.gtech.geoweather.databinding.FragmentHomeWeatherBinding
 import com.gtech.geoweather.models.WeatherResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.io.FileInputStream
+import java.text.SimpleDateFormat
 import java.util.*
+
 
 class HomeWeatherFragment : Fragment() {
 
@@ -42,8 +48,12 @@ class HomeWeatherFragment : Fragment() {
     }
     private lateinit var locationPermissionHandler: LocationPermissionHandler
 
-    val locationRequest =
+    private val locationRequest =
         LocationRequest.Builder(LocationRequest.PRIORITY_HIGH_ACCURACY, 5000).build()
+
+    private val openWeatherMapService by lazy {
+        OpenWeatherMapService(requireActivity())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,10 +64,11 @@ class HomeWeatherFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//check permission and add call the api
+        observe()
+
+        //check permission and add call the api
         locationPermissionHandler = LocationPermissionHandler(requireActivity(), permissionRequest)
         locationPermissionHandler.checkPermission()
-
     }
 
     private val permissionRequest =
@@ -87,14 +98,14 @@ class HomeWeatherFragment : Fragment() {
         val task = client.checkLocationSettings(builder.build())
 
         task.addOnSuccessListener {
-            // Location settings satisfied, continue with location request
+            // Location settings is on
             getLocationLatLng()
         }
 
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException) {
                 try {
-                    // Location settings not satisfied, prompt user to update settings
+                    // Location settings off, show dialog
                     gpsRequest.launch(
                         IntentSenderRequest.Builder(exception.resolution.intentSender).build()
                     )
@@ -166,10 +177,6 @@ class HomeWeatherFragment : Fragment() {
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null)
     }
 
-    private val openWeatherMapService by lazy {
-        OpenWeatherMapService(requireActivity())
-    }
-
     fun getWeatherData(latLng: LatLng) {
         val weatherApi = openWeatherMapService.api
 
@@ -177,6 +184,7 @@ class HomeWeatherFragment : Fragment() {
         val currentWeatherRequest = weatherApi.getCurrentWeather(
             latLng.latitude,
             latLng.longitude,
+            "metric",
             apiKey
         )
 
@@ -187,7 +195,7 @@ class HomeWeatherFragment : Fragment() {
             ) {
                 Log.d(TAG, response.toString())
                 if (response.isSuccessful) {
-                    val weatherResponse = response.body()
+                    viewModel.weatherUpdate.value = response.body()
                     // Handle the weather response here
                 } else {
                     // Handle the error here
@@ -199,5 +207,83 @@ class HomeWeatherFragment : Fragment() {
             }
 
         })
+
     }
+
+    private fun observe() {
+        viewModel.weatherUpdate.observe(viewLifecycleOwner) { weatherResponse ->
+            //Temperature in Celsius
+            val temp = getString(
+                com.gtech.geoweather.R.string.degree_celsius,
+                weatherResponse.main.temp.toString()
+            )
+            binding.txtDegreeCelsius.text = temp
+
+
+            //==========WEATHER=========
+            val weather = weatherResponse.weather
+            if (weather.isNotEmpty()) {
+                val firstWeather = weather[0]
+                val weatherImageUrl =
+                    "https://openweathermap.org/img/wn/${firstWeather.icon}@2x.png"
+//                Glide.with(requireContext()).load(weatherImageUrl)
+//                    .into(binding.imgWeather)
+                val imageSize = resources.getDimension(com.intuit.sdp.R.dimen._50sdp)
+                Glide.with(requireContext())
+                    .load(weatherImageUrl)
+                    .placeholder(com.gtech.geoweather.R.drawable.loading)
+                    .into(object :
+                        CustomTarget<Drawable?>(imageSize.toInt(), imageSize.toInt()) {
+
+                        fun setDrawable(drawable: Drawable?) {
+                            binding.imgWeather.setImageDrawable(drawable)
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                            setDrawable(placeholder)
+                        }
+
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable?>?
+                        ) {
+                            setDrawable(resource)
+                        }
+                    })
+
+                // Weather Description
+                val textCapWordsDescription = firstWeather.description.split(" ")
+                    .joinToString(" ") { it.replaceFirstChar { firstChar -> firstChar.uppercase() } }
+                binding.txtWeatherDesc.text = textCapWordsDescription
+
+            }
+
+
+            //==========SYS==============
+            val sys = weatherResponse.sys
+            // Location
+            val cityName = weatherResponse.name
+            val countryName = Countries.countries[sys.country]
+            binding.txtLocation.text = getString(
+                com.gtech.geoweather.R.string.location_city_country,
+                cityName,
+                countryName
+            )
+
+            // Sunrise and Sunset
+            val sunrise = convertTimeMillisToTime(sys.sunrise)
+            val sunset = convertTimeMillisToTime(sys.sunset)
+            binding.txtSunrise.text = sunrise
+            binding.txtSunset.text = sunset
+        }
+
+    }
+
+    fun convertTimeMillisToTime(timeInMillis: Int): String {
+        val dateFormat = SimpleDateFormat("mm dd, yy hh:mm a", Locale.ENGLISH)
+        Log.d("HomeWeather", dateFormat.format(Date(timeInMillis.toLong())))
+        val timeFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
+        return timeFormat.format(Date(timeInMillis.toLong()))
+    }
+
 }
