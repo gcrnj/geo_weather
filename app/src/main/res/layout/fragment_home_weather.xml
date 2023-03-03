@@ -30,7 +30,7 @@
 
 
             <androidx.appcompat.widget.AppCompatTextView
-                android:id="@+id/txtDegreeCelsius"
+                android:id="@+id/txtCurrentTemperature"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_80sdp"
                 android:layout_marginHorizontal="@dimen/_5sdp"
@@ -121,6 +121,7 @@
                     <ImageView
                         android:layout_width="@dimen/_50sdp"
                         android:layout_height="@dimen/_50sdp"
+                        android:contentDescription="@string/sunset"
                         android:src="@drawable/sunset" />
 
                     <com.google.android.material.textview.MaterialTextView
@@ -143,6 +144,7 @@
                     <ImageView
                         android:layout_width="@dimen/_50sdp"
                         android:layout_height="@dimen/_50sdp"
+                        android:contentDescription="@string/sunset"
                         android:src="@drawable/sunrise" />
 
                     <com.google.android.material.textview.MaterialTextView

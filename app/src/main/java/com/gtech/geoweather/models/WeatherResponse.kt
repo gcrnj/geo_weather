@@ -15,4 +15,22 @@ data class WeatherResponse(
     val visibility: Int,
     val weather: List<Weather>,
     val wind: Wind
-)
+) {
+    fun getWeatherDatabaseData(
+    ): WeatherDatabaseData {
+        return WeatherDatabaseData(
+            main.temp,
+            main.temp_min,
+            main.temp_max,
+            if (weather.isNotEmpty()) weather[0].description else "",
+            if (weather.isNotEmpty()) weather[0].icon else "",
+            wind.speed,
+            timezone,
+            sys.country,
+            name,
+            sys.sunrise,
+            sys.sunset,
+            dt
+        )
+    }
+}

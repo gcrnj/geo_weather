@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.gtech.geoweather.common.FirestoreUser
 import com.gtech.geoweather.common.setupAppBar
 import com.gtech.geoweather.databinding.ActivityRegisterBinding
 import com.gtech.geoweather.local_database.AppDatabase
@@ -27,7 +28,7 @@ class RegisterActivity : AppCompatActivity() {
     private val binding by lazy { ActivityRegisterBinding.inflate(layoutInflater) }
     private val userDao by lazy { AppDatabase.getDatabase(this).userDao() }
     private val firebaseAuth: FirebaseAuth by lazy { Firebase.auth }
-    private val firestoreDb by lazy { Firebase.firestore }
+    private val firestoreUser = FirestoreUser()
     private val simpleAlertDialog by lazy {
         val dialog = AlertDialog.Builder(this)
         dialog.setCancelable(false)
@@ -117,7 +118,7 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun registerInDb(newUser: User) {
-        firestoreDb.collection("users").add(newUser)
+        firestoreUser.insert(newUser)
             .addOnSuccessListener {
                 //authenticate in firebase firestore
                 registerToLocalDB(newUser)
