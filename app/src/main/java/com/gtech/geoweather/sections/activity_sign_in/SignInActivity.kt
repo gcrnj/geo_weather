@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.gtech.geoweather.common.hideSoftKeyboard
 import com.gtech.geoweather.common.setupAppBar
 import com.gtech.geoweather.databinding.ActivitySignInBinding
-import com.gtech.geoweather.local_database.AppDatabase
 import com.gtech.geoweather.sections.activity_landing_page.LandingPageActivity
 
 class SignInActivity : AppCompatActivity() {

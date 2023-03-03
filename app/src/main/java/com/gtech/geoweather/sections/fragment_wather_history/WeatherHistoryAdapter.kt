@@ -4,7 +4,6 @@ import android.app.Activity
 import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.gtech.geoweather.R
 import com.gtech.geoweather.common.loadImageWithGlide
 import com.gtech.geoweather.common.toFormattedTime

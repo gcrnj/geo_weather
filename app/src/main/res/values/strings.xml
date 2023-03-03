@@ -20,5 +20,7 @@
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
     <string name="time_at_city_country">%1$s\nat %2$s, %3$s</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="edit_profile">Edit Profile</string>
 
 </resources>
