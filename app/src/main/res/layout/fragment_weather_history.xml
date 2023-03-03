@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/teal_700"
+    android:background="@color/white"
     tools:context=".sections.fragment_wather_history.WeatherHistoryFragment">
 
     <LinearLayout
@@ -14,25 +14,59 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_10sdp">
 
             <TextView
                 android:id="@+id/txtFullName"
                 style="@style/TextAppearance.GeoWeather.TitleLarge"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                tools:text="Full Name"
+                app:layout_constraintEnd_toStartOf="@+id/txtLogout"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Full Name" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
+                android:id="@+id/eTxtEmail"
                 style="@style/TextAppearance.GeoWeather.BodyMedium"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                tools:text="email@account.com"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toStartOf="@+id/txtLogout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/txtFullName" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/txtLogout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textStyle="normal"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="@dimen/_10sdp"
+                android:padding="@dimen/_5sdp"
+                android:text="@string/sign_out"
+                android:textColor="@color/black"
+                app:drawableStartCompat="@drawable/ic_logot"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/txtEditProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:drawablePadding="@dimen/_10sdp"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:paddingVertical="@dimen/_3sdp"
+                android:text="@string/edit_profile"
+                android:textColor="@color/light_blue"
+                app:drawableStartCompat="@drawable/ic_edit"
+                app:drawableTint="@color/light_blue"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/txtFullName"
-                tools:text="email@account.com" />
+                app:layout_constraintTop_toBottomOf="@id/eTxtEmail" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.recyclerview.widget.RecyclerView

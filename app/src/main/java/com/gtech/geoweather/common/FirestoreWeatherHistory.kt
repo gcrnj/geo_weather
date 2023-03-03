@@ -1,6 +1,5 @@
 package com.gtech.geoweather.common
 
-import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
@@ -21,18 +20,18 @@ class FirestoreWeatherHistory(
         return try {
             documents.map {
                 WeatherDatabaseData(
-                    it.getDouble("temperature") ?: 0.0,
-                    it.getDouble("tem_min") ?: 0.0,
-                    it.getDouble("temp_max") ?: 0.0,
+                    it.get("temperature", Double::class.java) ?: 0.0,
+                    it.get("tem_min", Double::class.java) ?: 0.0,
+                    it.get("temp_max", Double::class.java) ?: 0.0,
                     it.getString("description") ?: "",
                     it.getString("icon") ?: "",
-                    it.getDouble("windSpeed") ?: 0.0,
-                    it.get("timezone").toString().toIntOrNull() ?: 0,
+                    it.get("windSpeed", Double::class.java) ?: 0.0,
+                    it.get("timezone", Int::class.java) ?: 0,
                     it.getString("country") ?: "",
                     it.getString("cityName") ?: "",
-                    it.get("sunrise").toString().toIntOrNull() ?: 0,
-                    it.get("sunset").toString().toIntOrNull() ?: 0,
-                    it.get("dateTime").toString().toIntOrNull() ?: 0,
+                    it.get("sunrise", Int::class.java) ?: 0,
+                    it.get("sunset", Int::class.java) ?: 0,
+                    it.get("dateTime", Int::class.java) ?: 0,
                 )
             }
         } catch (e: java.lang.Exception) {

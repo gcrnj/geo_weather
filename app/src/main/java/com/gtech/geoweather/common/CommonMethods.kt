@@ -3,14 +3,11 @@ package com.gtech.geoweather.common
 import android.app.Activity
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.util.Log
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
@@ -21,6 +18,12 @@ fun Activity.setupAppBar(title: String, hasBackButton: Boolean) {
     val appBarCustom = AppBarCustom(this, hasBackButton)
     appBarCustom.title = title
 }
+
+val Any.REGISTER_INTENTION: String
+    get() = "REGISTER_INTENTION"
+
+val Any.IS_EDIT: Int
+    get() = 100
 
 fun Activity.hideSoftKeyboard() {
     val inputMethodManager: InputMethodManager =
