@@ -24,12 +24,6 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
     }
-    fun convertTimeMillisToTime(timeInMillis: Int): String {
-        val dateFormat = SimpleDateFormat("mm dd, yy hh:mm a", Locale.ENGLISH)
-        Log.d("HomeWeather", dateFormat.format(Date(timeInMillis.toLong())))
-        val timeFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
-        return timeFormat.format(Date(timeInMillis.toLong()))
-    }
 
     private lateinit var scene : ActivityScenario<WelcomeActivity>
 

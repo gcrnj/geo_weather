@@ -22,11 +22,13 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.google.type.LatLng
 import com.gtech.geoweather.BuildConfig
 import com.gtech.geoweather.api.OpenWeatherMapService
-import com.gtech.geoweather.common.Countries
-import com.gtech.geoweather.common.LocationPermissionHandler
+import com.gtech.geoweather.common.*
 import com.gtech.geoweather.databinding.FragmentHomeWeatherBinding
 import com.gtech.geoweather.models.WeatherResponse
 import retrofit2.Call
@@ -39,21 +41,14 @@ import java.util.*
 class HomeWeatherFragment : Fragment() {
 
     val TAG = "Home Weather"
-    private val viewModel by lazy {
-        ViewModelProvider(this)[HomeWeatherViewModel::class.java]
-    }
-
-    private val binding by lazy {
-        FragmentHomeWeatherBinding.inflate(layoutInflater)
-    }
+    private val viewModel by lazy { ViewModelProvider(this)[HomeWeatherViewModel::class.java] }
+    private val binding by lazy { FragmentHomeWeatherBinding.inflate(layoutInflater) }
     private lateinit var locationPermissionHandler: LocationPermissionHandler
-
     private val locationRequest =
         LocationRequest.Builder(LocationRequest.PRIORITY_HIGH_ACCURACY, 5000).build()
-
-    private val openWeatherMapService by lazy {
-        OpenWeatherMapService(requireActivity())
-    }
+    private val openWeatherMapService by lazy { OpenWeatherMapService(requireActivity()) }
+    private val firebaseAuth: FirebaseAuth by lazy { Firebase.auth }
+    private val firestoreWeatherHistory = FirestoreWeatherHistory(firebaseAuth.currentUser?.uid)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -195,8 +190,27 @@ class HomeWeatherFragment : Fragment() {
             ) {
                 Log.d(TAG, response.toString())
                 if (response.isSuccessful) {
-                    viewModel.weatherUpdate.value = response.body()
                     // Handle the weather response here
+                    val weatherResponse = response.body()
+                    Log.d(TAG, weatherResponse.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData().toString())
+
+                    viewModel.weatherUpdate.value = weatherResponse
+
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.temperature.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.description.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.icon.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.windSpeed.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.timezone.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.country.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.sunrise.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.sunset.toString())
+                    Log.d(TAG, weatherResponse?.getWeatherDatabaseData()?.cityName.toString())
+
+                    weatherResponse?.let {
+                        firestoreWeatherHistory.insert(weatherResponse.getWeatherDatabaseData())
+                    }
+
                 } else {
                     // Handle the error here
                 }
@@ -217,39 +231,15 @@ class HomeWeatherFragment : Fragment() {
                 com.gtech.geoweather.R.string.degree_celsius,
                 weatherResponse.main.temp.toString()
             )
-            binding.txtDegreeCelsius.text = temp
+            binding.txtCurrentTemperature.text = temp
 
 
             //==========WEATHER=========
             val weather = weatherResponse.weather
             if (weather.isNotEmpty()) {
                 val firstWeather = weather[0]
-                val weatherImageUrl =
-                    "https://openweathermap.org/img/wn/${firstWeather.icon}@2x.png"
-//                Glide.with(requireContext()).load(weatherImageUrl)
-//                    .into(binding.imgWeather)
                 val imageSize = resources.getDimension(com.intuit.sdp.R.dimen._50sdp)
-                Glide.with(requireContext())
-                    .load(weatherImageUrl)
-                    .placeholder(com.gtech.geoweather.R.drawable.loading)
-                    .into(object :
-                        CustomTarget<Drawable?>(imageSize.toInt(), imageSize.toInt()) {
-
-                        fun setDrawable(drawable: Drawable?) {
-                            binding.imgWeather.setImageDrawable(drawable)
-                        }
-
-                        override fun onLoadCleared(placeholder: Drawable?) {
-                            setDrawable(placeholder)
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            transition: Transition<in Drawable?>?
-                        ) {
-                            setDrawable(resource)
-                        }
-                    })
+                context?.loadImageWithGlide(firstWeather.icon, imageSize, binding.imgWeather)
 
                 // Weather Description
                 val textCapWordsDescription = firstWeather.description.split(" ")
@@ -271,19 +261,13 @@ class HomeWeatherFragment : Fragment() {
             )
 
             // Sunrise and Sunset
-            val sunrise = convertTimeMillisToTime(sys.sunrise)
-            val sunset = convertTimeMillisToTime(sys.sunset)
+            val sunrise = sys.sunrise.toFormattedTime()
+            val sunset = sys.sunset.toFormattedTime()
             binding.txtSunrise.text = sunrise
             binding.txtSunset.text = sunset
         }
 
     }
 
-    fun convertTimeMillisToTime(timeInMillis: Int): String {
-        val dateFormat = SimpleDateFormat("mm dd, yy hh:mm a", Locale.ENGLISH)
-        Log.d("HomeWeather", dateFormat.format(Date(timeInMillis.toLong())))
-        val timeFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
-        return timeFormat.format(Date(timeInMillis.toLong()))
-    }
 
 }

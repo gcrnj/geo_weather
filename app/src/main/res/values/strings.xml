@@ -17,5 +17,8 @@
     <string name="history">History</string>
     <string name="degree_celsius">%1$s°C</string>
     <string name="location_city_country">%1$s, %2$s</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="time_at_city_country">%1$s\nat %2$s, %3$s</string>
 
 </resources>
