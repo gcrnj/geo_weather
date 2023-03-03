@@ -6,6 +6,7 @@ import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.gtech.geoweather.common.ProgressDialogCustom
 import com.gtech.geoweather.common.hideSoftKeyboard
 import com.gtech.geoweather.common.setupAppBar
 import com.gtech.geoweather.databinding.ActivitySignInBinding
@@ -17,6 +18,7 @@ class SignInActivity : AppCompatActivity() {
     private val firebaseAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
+    private val progressDialog by lazy { ProgressDialogCustom(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +28,7 @@ class SignInActivity : AppCompatActivity() {
         setupAppBar("Sign In", true)
 
         binding.btnSignIn.setOnClickListener {
+            progressDialog.show()
             hideSoftKeyboard()
             validateLogin()
         }
@@ -52,9 +55,11 @@ class SignInActivity : AppCompatActivity() {
                     landingPageIntent.flags =
                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(landingPageIntent)
+                    progressDialog.dismiss()
                     finish()
                 } else {
                     // Login failed, display an error message
+                    progressDialog.dismiss()
                     binding.tILayoutPassword.error =
                         "Account not found. Please check your credentials."
                 }

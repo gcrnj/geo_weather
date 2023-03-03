@@ -34,6 +34,7 @@ class RegisterActivity : AppCompatActivity() {
         }
         dialog
     }
+    private val progressDialog by lazy { ProgressDialogCustom(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +54,8 @@ class RegisterActivity : AppCompatActivity() {
         setupAppBar(title, true)
 
         binding.btnSignUp.setOnClickListener {
+            progressDialog.show()
+            hideSoftKeyboard()
             validateData()
         }
 
@@ -100,6 +103,7 @@ class RegisterActivity : AppCompatActivity() {
             binding.tILayoutLastName.error = errors.lastName
             binding.tILayoutEmail.error = errors.email
             binding.tILayoutMobileNumber.error = errors.mobileNumber
+            progressDialog.dismiss()
             return
         }
 
@@ -108,6 +112,7 @@ class RegisterActivity : AppCompatActivity() {
         if (passwordValidator != null) {
             binding.tILayoutPassword.error = passwordValidator[User.PASSWORD]
             binding.tILayoutConfirmPassword.error = passwordValidator[User.CONFIRM_PASSWORD]
+            progressDialog.dismiss()
             return
         }
 
@@ -132,6 +137,7 @@ class RegisterActivity : AppCompatActivity() {
                         "Failed to create user",
                         errorMessage
                     )
+                progressDialog.dismiss()
             }
         }
         if (isEdit) //Edit
@@ -156,6 +162,7 @@ class RegisterActivity : AppCompatActivity() {
                 )
                 //since it is already a logged in account, then I need to logout that account
                 firebaseAuth.signOut()
+                progressDialog.dismiss()
             }
     }
 
@@ -176,6 +183,7 @@ class RegisterActivity : AppCompatActivity() {
                 Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(landingPageIntent)
         }
+        progressDialog.dismiss()
         finish()
 
     }

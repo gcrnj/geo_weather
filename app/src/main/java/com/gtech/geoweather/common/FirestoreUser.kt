@@ -11,7 +11,7 @@ import kotlinx.coroutines.tasks.await
 class FirestoreUser(private val userDocumentId: String?) :
     FirestoreHelper<User?, Task<Void>, User> {
 
-    private val firebaseCollection: CollectionReference = firestoreDb.collection("users")
+    val firebaseCollection: CollectionReference = firestoreDb.collection("users")
 
     override suspend fun get(): User? {
         val userDocument = firebaseCollection.document(userDocumentId.toString()).get().await()

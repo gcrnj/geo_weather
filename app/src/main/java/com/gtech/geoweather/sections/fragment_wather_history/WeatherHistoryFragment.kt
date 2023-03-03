@@ -9,23 +9,26 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.ktx.Firebase
 import com.gtech.geoweather.WelcomeActivity
-import com.gtech.geoweather.common.FirestoreUser
-import com.gtech.geoweather.common.FirestoreWeatherHistory
-import com.gtech.geoweather.common.IS_EDIT
-import com.gtech.geoweather.common.REGISTER_INTENTION
+import com.gtech.geoweather.common.*
 import com.gtech.geoweather.databinding.FragmentWeatherHistoryBinding
+import com.gtech.geoweather.models.User
+import com.gtech.geoweather.models.WeatherDatabaseData
 import com.gtech.geoweather.sections.activity_register.RegisterActivity
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class WeatherHistoryFragment : Fragment() {
+class WeatherHistoryFragment : Fragment(),
+    com.google.firebase.firestore.EventListener<DocumentSnapshot> {
+
 
     private val TAG = "WeatherHistory"
 
@@ -35,21 +38,14 @@ class WeatherHistoryFragment : Fragment() {
     private val binding by lazy {
         FragmentWeatherHistoryBinding.inflate(layoutInflater)
     }
+    private val progressDialog by lazy { ProgressDialogCustom(requireActivity()) }
+
     private val firebaseAuth: FirebaseAuth by lazy { Firebase.auth }
     private val firestoreWeatherHistory = FirestoreWeatherHistory(firebaseAuth.currentUser?.uid)
     private val firestoreUser = FirestoreUser(firebaseAuth.currentUser?.uid)
     private val simpleAlertDialog by lazy {
         val dialog = AlertDialog.Builder(requireActivity())
         dialog.setCancelable(false)
-        dialog.setPositiveButton("Yes") { mDialog, _ ->
-            firebaseAuth.signOut()
-            mDialog.dismiss()
-            startActivity(Intent(requireContext(), WelcomeActivity::class.java))
-            activity?.finish()
-        }
-        dialog.setNegativeButton("No") { mDialog, _ ->
-            mDialog.dismiss()
-        }
         dialog
     }
 
@@ -72,43 +68,18 @@ class WeatherHistoryFragment : Fragment() {
             registerIntent.putExtra(REGISTER_INTENTION, IS_EDIT)
             startActivity(registerIntent)
         }
+
+        //Retrieve data realtime
+        updatePageData()
     }
 
-    private fun logoutUser() {
-        showAlertDialog("Logout", "Are you sure that you want to logout?")
-    }
+    //Retrieve data realtime
+    private fun updatePageData() {
+        progressDialog.show()
+        firestoreUser.firebaseCollection.document(firebaseAuth.currentUser?.uid ?: "")
+            .addSnapshotListener(this)
 
-    override fun onResume() {
-        super.onResume()
-        //Retrieve data whenever the user open/reopened to this fragment
-        getHistoryData()
-    }
-
-    private fun getHistoryData() {
-        lifecycleScope.launch {
-            val weatherDocs = firestoreWeatherHistory.get()
-
-            val weatherMap = weatherDocs?.groupBy {
-                val date = Date(it?.dateTime?.toLong()?.times(1000) ?: 0)
-                SimpleDateFormat("MMMM dd, yyyy", Locale.US).format(date)
-            }
-
-            Log.d(TAG, weatherDocs.toString())
-            viewModel.weatherHistoryData.value = weatherMap
-            updateUserData()
-
-        }
-    }
-
-    suspend fun updateUserData() {
-        val userData = firestoreUser.get()
-        userData?.let {
-            val nameList =
-                listOf(it.firstName.trim(), it.middleName.trim(), it.lastName.trim())
-            val fullName = nameList.joinToString(" ")
-            binding.txtFullName.text = fullName
-            binding.eTxtEmail.text = it.email
-        }
+        firestoreWeatherHistory.firebaseCollection.addSnapshotListener(weatherHistoryListener)
     }
 
     private fun observe() {
@@ -123,15 +94,110 @@ class WeatherHistoryFragment : Fragment() {
                     WeatherHistoryAdapter(requireActivity(), weatherDatabaseData)
                 binding.recyclerHistory.adapter = weatherHistoryAdapter
             }
-
-
             //set adapter
+        }
+        viewModel.user.observe(viewLifecycleOwner) { user ->
+            user?.let {
+                val nameList =
+                    listOf(it.firstName.trim(), it.middleName.trim(), it.lastName.trim())
+                val fullName = nameList.joinToString(" ")
+                binding.txtFullName.text = fullName
+                binding.eTxtEmail.text = it.email
+            }
         }
     }
 
-    fun showAlertDialog(title: String, message: String) {
+    private fun showLogoutDialog(title: String, message: String) {
         simpleAlertDialog.setTitle(title)
         simpleAlertDialog.setMessage(message)
         simpleAlertDialog.show()
     }
+
+    override fun onEvent(value: DocumentSnapshot?, error: FirebaseFirestoreException?) {
+
+        if (error != null) {
+            showErrorDialog(error)
+            return
+        }
+        if (value != null && value.exists()) {
+            updateUserData(value)
+        }
+    }
+
+    private fun showErrorDialog(error: FirebaseFirestoreException) {
+        // handle the exception
+        simpleAlertDialog.setPositiveButton("Ok") { mDialog, _ ->
+            firebaseAuth.signOut()
+            mDialog.dismiss()
+            startActivity(Intent(requireContext(), WelcomeActivity::class.java))
+            activity?.finish()
+        }
+        simpleAlertDialog.setNegativeButton(null, null)
+        showLogoutDialog("Error", error.message ?: "Something went wrong")
+    }
+
+    private val weatherHistoryListener =
+        EventListener<QuerySnapshot> { value, error ->
+
+            progressDialog.dismiss()
+            if (error != null) {
+                showErrorDialog(error)
+                return@EventListener
+            }
+            if (value != null) {
+                updateRecyclerView(value)
+            }
+        }
+
+    private fun updateRecyclerView(value: QuerySnapshot) {
+
+        val documents = value.documents.map {
+            WeatherDatabaseData(
+                it.get("temperature", Double::class.java) ?: 0.0,
+                it.get("tem_min", Double::class.java) ?: 0.0,
+                it.get("temp_max", Double::class.java) ?: 0.0,
+                it.getString("description") ?: "",
+                it.getString("icon") ?: "",
+                it.get("windSpeed", Double::class.java) ?: 0.0,
+                it.get("timezone", Int::class.java) ?: 0,
+                it.getString("country") ?: "",
+                it.getString("cityName") ?: "",
+                it.get("sunrise", Int::class.java) ?: 0,
+                it.get("sunset", Int::class.java) ?: 0,
+                it.get("dateTime", Int::class.java) ?: 0,
+            )
+        }
+
+        val weatherMap = documents.groupBy {
+            val date = Date(it.dateTime.toLong().times(1000))
+            SimpleDateFormat("MMMM dd, yyyy", Locale.US).format(date)
+        }
+        viewModel.weatherHistoryData.value = weatherMap
+    }
+
+    private fun updateUserData(value: DocumentSnapshot) {
+        val user = User(
+            value.get("id", Int::class.java) ?: 0,
+            value.getString("firstName") ?: "",
+            value.getString("middleName") ?: "",
+            value.getString("lastName") ?: "",
+            value.getString("email") ?: "",
+            value.getString("mobileNumber") ?: "",
+        )
+        viewModel.user.value = user
+    }
+
+    private fun logoutUser() {
+        simpleAlertDialog.setPositiveButton("Yes") { mDialog, _ ->
+            firebaseAuth.signOut()
+            mDialog.dismiss()
+            startActivity(Intent(requireContext(), WelcomeActivity::class.java))
+            activity?.finish()
+        }
+        simpleAlertDialog.setNegativeButton("No") { mDialog, _ ->
+            mDialog.dismiss()
+        }
+        showLogoutDialog("Logout", "Are you sure that you want to logout?")
+    }
+
 }

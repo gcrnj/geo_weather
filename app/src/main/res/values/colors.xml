@@ -9,6 +9,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="white_text_color">#DAE0E1</color>
 
+    <color name="afternoon_card">#F8AB33</color>
+    <color name="afternoon">#FFB37B</color>
     <color name="black_charcoal">#495867</color>
     <color name="black_charcoal1">#405C63</color>
     <color name="black_charcoal2">#06070B</color>
