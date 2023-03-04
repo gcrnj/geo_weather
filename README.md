@@ -40,8 +40,10 @@ To log in to your account, follow these steps:
 To run the app's unit tests, follow these steps:
 
 1. Open the project in Android Studio.
-2. Open the "UserTesting.kt" file located in the "com.gtech.geoweather" package.
-3. Run the tests using the Android Studio test runner.
+2. Open the "TestConstants.kt" file located in the "com.gtech.geoweather" package.
+3. Input your credentials based on variable names under the TestConstants object.
+4. Open the "UserTesting.kt" file located in the "com.gtech.geoweather" package.
+5. Run the tests using the Android Studio test runner.
 
 ## Features
 
