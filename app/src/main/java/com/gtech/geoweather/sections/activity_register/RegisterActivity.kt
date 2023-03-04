@@ -160,8 +160,8 @@ class RegisterActivity : AppCompatActivity() {
                     "Failed to create user",
                     exception.message ?: "Message not found"
                 )
-                //since it is already a logged in account, then I need to logout that account
-                firebaseAuth.signOut()
+                if (!isEdit) //Creating, delete account
+                    firebaseAuth.currentUser?.delete()
                 progressDialog.dismiss()
             }
     }

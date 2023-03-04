@@ -29,6 +29,7 @@
                 app:errorIconDrawable="@null">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/eTxtEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica_neue_medium"
@@ -46,6 +47,7 @@
                 app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/eTxtPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica_neue_medium"

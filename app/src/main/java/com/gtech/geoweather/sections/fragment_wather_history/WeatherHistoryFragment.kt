@@ -27,7 +27,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class WeatherHistoryFragment : Fragment(),
-    com.google.firebase.firestore.EventListener<DocumentSnapshot> {
+    EventListener<DocumentSnapshot> {
 
 
     private val TAG = "WeatherHistory"
@@ -53,7 +53,6 @@ class WeatherHistoryFragment : Fragment(),
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        observe()
         return binding.root
     }
 
@@ -69,8 +68,12 @@ class WeatherHistoryFragment : Fragment(),
             startActivity(registerIntent)
         }
 
+        Log.d(TAG, viewModel.weatherHistoryData.value.toString())
         //Retrieve data realtime
-        updatePageData()
+        if (viewModel.weatherHistoryData.value == null)
+            updatePageData()
+
+        observe()
     }
 
     //Retrieve data realtime
@@ -102,7 +105,7 @@ class WeatherHistoryFragment : Fragment(),
                     listOf(it.firstName.trim(), it.middleName.trim(), it.lastName.trim())
                 val fullName = nameList.joinToString(" ")
                 binding.txtFullName.text = fullName
-                binding.eTxtEmail.text = it.email
+                binding.txtEmail.text = it.email
             }
         }
     }
