@@ -64,10 +64,13 @@ class HomeWeatherFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         observe()
 
-        //check permission and add call the api
-        locationPermissionHandler = LocationPermissionHandler(requireActivity(), permissionRequest)
-        locationPermissionHandler.checkPermission()
-        progressDialog.show()
+        if (viewModel.weatherUpdate.value == null) {
+            //check permission and add call the api
+            locationPermissionHandler =
+                LocationPermissionHandler(requireActivity(), permissionRequest)
+            locationPermissionHandler.checkPermission()
+            progressDialog.show()
+        }
     }
 
     private val permissionRequest =
@@ -90,11 +93,11 @@ class HomeWeatherFragment : Fragment() {
         }
 
     private fun buildGPSDialog() {
-// Create a LocationSettingsRequest.Builder object
+        // Create a LocationSettingsRequest.Builder object
         val builder = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest)
 
-// Check if the current location settings satisfy the LocationSettingsRequest
+        // Check if the current location settings satisfy the LocationSettingsRequest
         val client = LocationServices.getSettingsClient(requireActivity())
         val task = client.checkLocationSettings(builder.build())
 
@@ -146,10 +149,6 @@ class HomeWeatherFragment : Fragment() {
                 }
             }
         }
-
-    override fun onResume() {
-        super.onResume()
-    }
 
     @SuppressLint("MissingPermission")
     fun getLocationLatLng() {

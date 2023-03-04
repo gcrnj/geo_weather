@@ -29,7 +29,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/eTxtEmail"
+                android:id="@+id/txtEmail"
                 style="@style/TextAppearance.GeoWeather.BodyMedium"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

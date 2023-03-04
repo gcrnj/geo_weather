@@ -1,37 +1,55 @@
 package com.gtech.geoweather.sections.activity_landing_page
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.gtech.geoweather.WelcomeActivity
 import com.gtech.geoweather.databinding.ActivityLandingPageBinding
-import com.gtech.geoweather.sections.fragment_wather_history.WeatherHistoryFragment
-import com.gtech.geoweather.sections.fragment_weather_home.HomeWeatherFragment
 import nl.joery.animatedbottombar.AnimatedBottomBar
 
 class LandingPageActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityLandingPageBinding.inflate(layoutInflater) }
 
+    private val viewModel by lazy {
+        ViewModelProvider(this)[LandingPageViewModel::class.java]
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        if (Firebase.auth.currentUser == null) {
+            logoutUser()
+            return
+        }
         binding.bottomBar.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
-            val fragments = listOf(HomeWeatherFragment(), WeatherHistoryFragment())
             override fun onTabSelected(
                 lastIndex: Int,
                 lastTab: AnimatedBottomBar.Tab?,
                 newIndex: Int,
                 newTab: AnimatedBottomBar.Tab
             ) {
-                replaceFragments(fragments[newIndex])
+                replaceFragments(viewModel.fragments.value!![newIndex])
+                viewModel.currentTabSelected.value = newIndex
             }
 
         })
 
-        binding.bottomBar.selectTabAt(0)
+        observe()
+    }
 
+    private fun observe() {
+        viewModel.currentTabSelected.observe(this) {
+            if (it != binding.bottomBar.selectedIndex)
+                binding.bottomBar.selectTabAt(it)
+        }
     }
 
     private fun replaceFragments(selected: Fragment) {
@@ -60,5 +78,11 @@ class LandingPageActivity : AppCompatActivity() {
             }
             commit()
         }
+    }
+
+    private fun logoutUser() {
+        Firebase.auth.signOut()
+        startActivity(Intent(this, WelcomeActivity::class.java))
+        finish()
     }
 }
