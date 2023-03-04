@@ -1,65 +1,196 @@
 package com.gtech.geoweather.sections.activity_register
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log.d
-import com.gtech.geoweather.common.AppBarCustom
+import android.view.View
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.children
+import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.material.textfield.TextInputLayout
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import com.gtech.geoweather.common.*
 import com.gtech.geoweather.databinding.ActivityRegisterBinding
 import com.gtech.geoweather.models.User
+import com.gtech.geoweather.sections.activity_landing_page.LandingPageActivity
+import kotlinx.coroutines.*
+
 
 class RegisterActivity : AppCompatActivity() {
 
     private val binding by lazy { ActivityRegisterBinding.inflate(layoutInflater) }
+    private val firebaseAuth: FirebaseAuth by lazy { Firebase.auth }
+    private val firestoreUser = FirestoreUser(firebaseAuth.currentUser?.uid)
+    private val isEdit by lazy { intent.getIntExtra(REGISTER_INTENTION, 0) == IS_EDIT }
+    private val simpleAlertDialog by lazy {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setCancelable(false)
+        dialog.setPositiveButton("Ok") { mDialog, _ ->
+            mDialog.dismiss()
+        }
+        dialog
+    }
+    private val progressDialog by lazy { ProgressDialogCustom(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        setupAppBar()
+        val title =
+            if (isEdit) {
+                binding.eTxtEmail.isEnabled = false
+                setFieldsUserData()
+                "Edit Profile"
+            } else {
+                binding.eTxtEmail.isEnabled = true
+                "Register"
+            }
+
+
+        setupAppBar(title, true)
 
         binding.btnSignUp.setOnClickListener {
-            validateRegister()
+            progressDialog.show()
+            hideSoftKeyboard()
+            validateData()
         }
 
     }
 
+    private fun setFieldsUserData() {
 
-    private fun setupAppBar() {
-        val appBarCustom = AppBarCustom(this, true)
-        appBarCustom.title = "Sign In"
+        lifecycleScope.launch {
+            val userData = firestoreUser.get()
+            userData?.let {
+                binding.eTxtFirstName.setText(it.firstName)
+                binding.eTxtMiddleName.setText(it.middleName)
+                binding.eTxtLastName.setText(it.lastName)
+                binding.eTxtMobileNumber.setText(it.mobileNumber)
+                binding.eTxtEmail.setText(it.email)
+            }
+
+        }
     }
 
-    private fun validateRegister() {
+
+    private fun validateData() {
+        resetErrors()
         val firstName = binding.tILayoutFirstName.editText?.text.toString()
         val middleName = binding.tILayoutMiddleName.editText?.text.toString()
         val lastName = binding.tILayoutLastName.editText?.text.toString()
         val email = binding.tILayoutEmail.editText?.text.toString()
         val mobileNumber = binding.tILayoutMobileNumber.editText?.text.toString()
-        val user = User(firstName, middleName, lastName, email, mobileNumber)
+        val password = binding.tILayoutPassword.editText?.text.toString()
+        val confirmPassword = binding.tILayoutConfirmPassword.editText?.text.toString()
+        val user = User(
+            firstName = firstName,
+            middleName = middleName,
+            lastName = lastName,
+            email = email,
+            mobileNumber = mobileNumber,
+        )
 
         //Validate errors first
-        user.errors?.let {
-            d("Regiter", it.toString())
+        val errors = user.errors()
+        if (errors != null) {
             // Not Validated - display errors
-            binding.tILayoutFirstName.error = it.firstName
-            binding.tILayoutMiddleName.error = it.middleName
-            binding.tILayoutLastName.error = it.lastName
-            binding.tILayoutEmail.error = it.email
-            binding.tILayoutMobileNumber.error = it.mobileNumber
-        }?.run {
+            binding.tILayoutFirstName.error = errors.firstName
+            binding.tILayoutMiddleName.error = errors.middleName
+            binding.tILayoutLastName.error = errors.lastName
+            binding.tILayoutEmail.error = errors.email
+            binding.tILayoutMobileNumber.error = errors.mobileNumber
+            progressDialog.dismiss()
+            return
+        }
 
-            //Validated - check password
-            val password = binding.tILayoutPassword.editText?.text.toString()
-            val confirmPassword = binding.tILayoutConfirmPassword.editText?.text.toString()
+        //Validated - check password
+        val passwordValidator = User.isValidPasswords(password, confirmPassword)
+        if (passwordValidator != null) {
+            binding.tILayoutPassword.error = passwordValidator[User.PASSWORD]
+            binding.tILayoutConfirmPassword.error = passwordValidator[User.CONFIRM_PASSWORD]
+            progressDialog.dismiss()
+            return
+        }
 
-            val passwordValidator = User.isValidPasswords(password, confirmPassword)
-            passwordValidator?.let {
-                binding.tILayoutPassword.error = it[User.PASSWORD]
-                binding.tILayoutConfirmPassword.error = it[User.CONFIRM_PASSWORD]
-            }?.run {
-                // Validated - TODO register the user
+        // Validated - check email if already registered
+        createUserInAuth(user, password)
+    }
 
+    //Creates
+    private fun createUserInAuth(newUser: User, password: String) {
+        val onCompleteListener = OnCompleteListener<AuthResult> { task ->
+            if (task.isSuccessful) {
+                //User registered successfully
+                registerInDb(newUser)
+            } else {
+                // User not registered
+                task.exception?.printStackTrace()
+                val errorMessage = task.exception?.message ?: "Message not found"
+                if (errorMessage.contains("email") && !isEdit)
+                    binding.tILayoutEmail.error = errorMessage
+                else
+                    showAlertDialog(
+                        "Failed to create user",
+                        errorMessage
+                    )
+                progressDialog.dismiss()
             }
         }
+        if (isEdit) //Edit
+            firebaseAuth.signInWithEmailAndPassword(newUser.email, password)
+                .addOnCompleteListener(onCompleteListener)
+        else //Create
+            firebaseAuth.createUserWithEmailAndPassword(newUser.email, password)
+                .addOnCompleteListener(onCompleteListener)
+    }
+
+    private fun registerInDb(newUser: User) {
+        firestoreUser.insert(newUser)
+            .addOnSuccessListener {
+                //authenticate in firebase firestore
+                updateActivity()
+            }
+            .addOnFailureListener { exception ->
+                //failed to create the user
+                showAlertDialog(
+                    "Failed to create user",
+                    exception.message ?: "Message not found"
+                )
+                if (!isEdit) //Creating, delete account
+                    firebaseAuth.currentUser?.delete()
+                progressDialog.dismiss()
+            }
+    }
+
+    private fun resetErrors() {
+        for (view: View in binding.linearForm.children) {
+            if (view is TextInputLayout) {
+                view.error = null
+            }
+        }
+    }
+
+    private fun updateActivity() {
+        if (!isEdit) {
+            //go to landing page
+            val landingPageIntent =
+                Intent(this@RegisterActivity, LandingPageActivity::class.java)
+            landingPageIntent.flags =
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(landingPageIntent)
+        }
+        progressDialog.dismiss()
+        finish()
+
+    }
+
+    fun showAlertDialog(title: String, message: String) {
+        simpleAlertDialog.setTitle(title)
+        simpleAlertDialog.setMessage(message)
+        simpleAlertDialog.show()
     }
 }

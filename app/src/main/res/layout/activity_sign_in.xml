@@ -22,16 +22,20 @@
             android:showDividers="middle">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tILayoutEmailOrMobile"
+                android:id="@+id/tILayoutEmail"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:errorIconDrawable="@null">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/eTxtEmail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica_neue_medium"
-                    android:hint="@string/mobile_number_email_address" />
+                    android:hint="@string/email_address"
+                    android:inputType="textEmailAddress"
+                    android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -39,13 +43,17 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:errorIconDrawable="@null"
                 app:passwordToggleEnabled="true">
 
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/eTxtPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica_neue_medium"
-                    android:hint="@string/password" />
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -53,7 +61,7 @@
                 style="@style/Theme.GeoWeather.MaterialButton.ZeroInset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Login" />
+                android:text="@string/sign_in" />
         </LinearLayout>
 
     </ScrollView>

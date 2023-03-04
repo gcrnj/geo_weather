@@ -6,59 +6,58 @@ import android.util.Patterns
 
 
 data class User(
+    val id: Int? = 0,
     val firstName: String,
-    val middleName: String?,
+    val middleName: String,
     val lastName: String,
     val email: String,
-    val mobileNumber: String,
+    val mobileNumber: String
 ) {
 
     // Will return null if the user is validated
-    var errors: User? = null
-        get() {
-            //Error Messages
-            var eFirstName = ""
-            var eMiddleName = ""
-            var eLastName = ""
-            var eEmail = ""
-            var eMobileNumber = ""
-            var validated = true
-            if (firstName.isBlank()) {
-                eFirstName = "First name cannot be blank"
-                validated = false
-            } else if (firstName.length < 2) {
-                eFirstName = "First name cannot be less than 2 characters"
-                validated = false
-            }
-
-            if (middleName != null && middleName.isNotBlank() && middleName.length < 2) {
-                eMiddleName = "Please enter your full middle name"
-                validated = false
-            }
-
-            if (lastName.isBlank()) {
-                eLastName = "Last name cannot be blank"
-                validated = false
-            } else if (lastName.length < 2) {
-                eLastName = "Last name cannot be less than 2 characters"
-                validated = false
-            }
-
-            if (!isValidEmail()) {
-                eEmail = "Please enter a valid email address"
-                validated = false
-            }
-
-            if (!isValidMobileNumber()) {
-                eMobileNumber = "Please enter a valid Philippine phone number"
-                validated = false
-            }
-
-            // Return null if not validated, otherwise return user with errors
-            return if (validated) null
-            else User(eFirstName, eMiddleName, eLastName, eEmail, eMobileNumber)
+    fun errors(): User? {
+        //Error Messages
+        var eFirstName = ""
+        var eMiddleName = ""
+        var eLastName = ""
+        var eEmail = ""
+        var eMobileNumber = ""
+        var validated = true
+        if (firstName.isBlank()) {
+            eFirstName = "First name cannot be blank"
+            validated = false
+        } else if (firstName.length < 2) {
+            eFirstName = "First name cannot be less than 2 characters"
+            validated = false
         }
-        private set // Remove setter
+
+        if (middleName.isNotBlank() && middleName.length < 2) {
+            eMiddleName = "Please enter your full middle name"
+            validated = false
+        }
+
+        if (lastName.isBlank()) {
+            eLastName = "Last name cannot be blank"
+            validated = false
+        } else if (lastName.length < 2) {
+            eLastName = "Last name cannot be less than 2 characters"
+            validated = false
+        }
+
+        if (!isValidEmail()) {
+            eEmail = "Please enter a valid email address"
+            validated = false
+        }
+
+        if (!isValidMobileNumber()) {
+            eMobileNumber = "Please enter a valid Philippine phone number"
+            validated = false
+        }
+
+        // Return null if not validated, otherwise return user with errors
+        return if (validated) null
+        else User(0, eFirstName, eMiddleName, eLastName, eEmail, eMobileNumber)
+    }
 
     private fun isValidEmail(): Boolean {
         return !TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches()
